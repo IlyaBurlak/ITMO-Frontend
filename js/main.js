@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
     // Загрузка CV
     const downloadButtonCV = document.getElementById('CV-btn');
     if (downloadButtonCV) {
@@ -58,6 +59,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* Очистка LocalStorage*/
+
+    const clearLocalStorageButton = document.getElementById('clear-local-storage-btn');
+    clearLocalStorageButton.addEventListener('click', () => {
+        localStorage.clear();
+        alert('Local storage очищен!');
+    });
+
+    /*----------------------------------Добавление новых коментриев через форму---------------------------------------*/
+
     const commentForm = document.getElementById('comment-form');
     const submitButton = document.querySelector('button[type="submit"]');
 
@@ -65,9 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearCommentsButton = document.getElementById('clear-comments-btn');
     if (clearCommentsButton) {
         clearCommentsButton.addEventListener('click', () => {
-            localStorage.removeItem('comments'); // Очистить localStorage
+            localStorage.removeItem('comments');
             const commentsContainer = document.querySelector('.comments-container');
-            commentsContainer.innerHTML = ''; // Очистить контейнер комментариев
+            commentsContainer.innerHTML = '';
         });
     }
 
@@ -132,17 +143,24 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteButton.textContent = 'Удалить';
         commentDiv.appendChild(deleteButton);
 
-        // Обработчик события для удаления
         deleteButton.addEventListener('click', () => {
             commentDiv.remove();
             const storedComments = JSON.parse(localStorage.getItem('comments'));
             if (storedComments) {
-                storedComments.splice(commentDiv.dataset.index, 1);
-                localStorage.setItem('comments', JSON.stringify(storedComments));
+                const updatedComments = storedComments.filter((_, i) => i !== parseInt(commentDiv.dataset.index));
+                localStorage.setItem('comments', JSON.stringify(updatedComments));
+
+                const commentsContainer = document.querySelector('.comments-container');
+                commentsContainer.innerHTML = '';
+                updatedComments.forEach((comment, index) => {
+                    const newComment = createCommentElement(comment.name, comment.surname, comment.telegram, comment.commentText, index);
+                    commentsContainer.appendChild(newComment);
+                });
             }
         });
 
+
         return commentDiv;
     }
-});
 
+});

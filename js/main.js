@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 surname: surname,
                                 email: comment.email,
                                 commentText: comment.body
-                            })
+                            });
                             const commentElement = createLoadCommentElement(name, surname, comment.email, comment.body);
                             commentsContainer.appendChild(commentElement);
                         }
@@ -266,14 +266,36 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 removePreloader();
-                commentsContainer.innerHTML = '<p>⚠ Что-то пошло не так</p>';
+                showToast('⚠ Что-то пошло не так', 'error');
                 console.error('Error fetching comments:', error);
             });
     }
+
 
     // Обработчик события для загрузки комментариев
     loadButton.addEventListener('click', () => {
         lastId = lastId === 0 ? 1 : 100;
         fetchComments(lastId);
     });
+
+
+
+    function showToast(message, type = 'error') {
+        const toast = document.createElement('div');
+        toast.className = `
+        ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}
+        text-white p-4 rounded-lg shadow-lg opacity-90 transition duration-300
+    `;
+        toast.innerText = message;
+
+        document.getElementById('toast-container').appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('opacity-0');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+
 });

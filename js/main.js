@@ -72,34 +72,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentForm = document.getElementById('comment-form');
     const submitButton = document.querySelector('button[type="submit"]');
 
-    // Очистка комментариев
-    const clearCommentsButton = document.getElementById('clear-comments-btn');
-    if (clearCommentsButton) {
-        clearCommentsButton.addEventListener('click', () => {
-            localStorage.removeItem('comments');
-            const commentsContainer = document.querySelector('.comments-container');
-            commentsContainer.innerHTML = '';
-        });
+// Функция для отображения Toast уведомления
+    function showToast(message, type = 'error') {
+        const toast = document.createElement('div');
+        toast.className = `
+        ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}
+        text-white p-4 rounded-lg shadow-lg opacity-90 transition duration-300 mb-4
+    `;
+        toast.innerText = message;
+
+        const toastContainer = document.getElementById('toast-container');
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('opacity-0');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
     }
 
-    // Проверка существующих комментариев и отображение их на странице
-    const storedComments = JSON.parse(localStorage.getItem('comments'));
-    if (storedComments) {
-        storedComments.forEach((comment, index) => {
-            const newComment = createCommentElement(comment.name, comment.surname, comment.telegram, comment.commentText, index);
-            const commentsContainer = document.querySelector('.comments-container');
-            commentsContainer.appendChild(newComment);
-        });
-    }
-
-    // Обработчик отправки формы для комментариев
+// Обработчик отправки формы для комментариев
     if (commentForm && submitButton) {
         submitButton.addEventListener('click', (event) => {
             event.preventDefault();
-            const name = document.getElementById('nameC').value;
-            const surname = document.getElementById('surname').value;
-            const telegram = document.getElementById('telegram').value;
-            const commentText = document.getElementById('comment').value;
+
+            const name = document.getElementById('nameC').value.trim();
+            const surname = document.getElementById('surname').value.trim();
+            const telegram = document.getElementById('telegram').value.trim();
+            const commentText = document.getElementById('comment').value.trim();
+
+            // Проверка заполненности каждого поля
+            if (!name || !surname || !telegram || !commentText) {
+                showToast('⚠ Пожалуйста, заполните все поля.', 'error');
+                return; // Прекращаем выполнение, если есть незаполненные поля
+            }
 
             const newComment = createCommentElement(name, surname, telegram, commentText);
 
@@ -111,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             commentsContainer.appendChild(newComment);
 
             commentForm.reset();
+            showToast('✅ Комментарий успешно добавлен!', 'success');
         });
     }
 
@@ -162,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return commentDiv;
     }
-
 
     /*----------------------------------Загрузка новых коментриев через JSON---------------------------------------*/
 
@@ -277,25 +284,5 @@ document.addEventListener('DOMContentLoaded', () => {
         lastId = lastId === 0 ? 1 : 100;
         fetchComments(lastId);
     });
-
-
-
-    function showToast(message, type = 'error') {
-        const toast = document.createElement('div');
-        toast.className = `
-        ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}
-        text-white p-4 rounded-lg shadow-lg opacity-90 transition duration-300
-    `;
-        toast.innerText = message;
-
-        document.getElementById('toast-container').appendChild(toast);
-
-        setTimeout(() => {
-            toast.classList.add('opacity-0');
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
-        }, 3000);
-    }
 
 });

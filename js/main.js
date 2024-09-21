@@ -163,4 +163,117 @@ document.addEventListener('DOMContentLoaded', () => {
         return commentDiv;
     }
 
+
+    /*----------------------------------Загрузка новых коментриев через JSON---------------------------------------*/
+
+    const loadButton = document.getElementById('load-button');
+    const commentsContainer = document.querySelector('.comments-container');
+    const preloader = document.createElement('div');
+    let lastId = 0;
+
+    // Создание прелоадера
+    function createPreloader() {
+        preloader.classList.add('preloader');
+        preloader.classList.add('preloader-animation');
+        commentsContainer.appendChild(preloader);
+    }
+
+    function removePreloader() {
+        if (preloader.parentElement) {
+            preloader.remove();
+        }
+    }
+
+    // Создание элемента комментария
+    function createLoadCommentElement(name, surname, email, body) {
+        const commentDiv = document.createElement('div');
+        commentDiv.classList.add('comment');
+
+        const nameHeader = document.createElement('h3');
+        nameHeader.textContent = `${name} ${surname}`;
+        commentDiv.appendChild(nameHeader);
+
+        // Создание ссылки для email
+        const emailLink = document.createElement('a');
+        emailLink.href = `mailto:${email}`;
+        emailLink.textContent = email;
+        emailLink.target = '_blank';
+        const emailParagraph = document.createElement('p');
+        emailParagraph.textContent = 'Email: ';
+        emailParagraph.appendChild(emailLink);
+        commentDiv.appendChild(emailParagraph);
+
+        const commentParagraph = document.createElement('p');
+        commentParagraph.textContent = body;
+        commentDiv.appendChild(commentParagraph);
+
+        // Кнопка удаления комментария
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('comment__delete-btn');
+        deleteButton.textContent = 'Удалить';
+        commentDiv.appendChild(deleteButton);
+
+        // Обработчик события для удаления комментария
+        deleteButton.addEventListener('click', () => {
+            commentDiv.remove();
+            const storedComments = JSON.parse(localStorage.getItem('comments'));
+            if (storedComments) {
+                const index = storedComments.findIndex(c => c.commentText === body && c.email === email);
+                if (index !== -1) {
+                    storedComments.splice(index, 1);
+                    localStorage.setItem('comments', JSON.stringify(storedComments));
+                }
+            }
+        });
+
+        return commentDiv;
+    }
+
+    // Функция загрузки комментариев
+    function fetchComments(id) {
+        createPreloader();
+        fetch(`https://jsonplaceholder.typicode.com/comments?id_gte=${id}&_limit=3`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                removePreloader();
+                const storedComments = JSON.parse(localStorage.getItem('comments')) || [];
+
+                data.forEach(comment => {
+                    if (comment.email) {
+                        const existingComment = storedComments.find(c => c.commentText === comment.body && c.email === comment.email);
+                        if (!existingComment) {
+                            const name = 'Load';
+                            const surname = 'Comment';
+
+                            storedComments.push({
+                                name: name,
+                                surname: surname,
+                                email: comment.email,
+                                commentText: comment.body
+                            })
+                            const commentElement = createLoadCommentElement(name, surname, comment.email, comment.body);
+                            commentsContainer.appendChild(commentElement);
+                        }
+                    }
+                });
+
+                localStorage.setItem('comments', JSON.stringify(storedComments));
+            })
+            .catch(error => {
+                removePreloader();
+                commentsContainer.innerHTML = '<p>⚠ Что-то пошло не так</p>';
+                console.error('Error fetching comments:', error);
+            });
+    }
+
+    // Обработчик события для загрузки комментариев
+    loadButton.addEventListener('click', () => {
+        lastId = lastId === 0 ? 1 : 100;
+        fetchComments(lastId);
+    });
 });

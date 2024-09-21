@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (telegram) {
             const telegramLink = document.createElement('a');
             telegramLink.href = `https://t.me/${telegram}`;
-            telegramLink.textContent = `@${telegram}`;
+            telegramLink.textContent = `${telegram}`;
             telegramLink.target = '_blank';
             const telegramParagraph = document.createElement('p');
             telegramParagraph.textContent = 'Telegram: ';

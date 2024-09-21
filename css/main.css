@@ -561,6 +561,9 @@ tr > th:nth-child(2n + 1){
 }
 #nameC , #surname , #telegram, #comment{
     margin-left: 10px;
+    border: 3px solid var(--accent);
+    border-radius: 5px;
+    padding-left: 5px;
 }
 
 
@@ -593,6 +596,7 @@ tr > th:nth-child(2n + 1){
 }
 
 .comment__delete-btn{
+    display: flex;
     border: 1px solid indianred;
     border-radius: 5px;
     background-color: rgb(202	71	52	);
@@ -607,12 +611,14 @@ tr > th:nth-child(2n + 1){
 .comment-form{
     caret-color: var(--accent);
 }
+
 /*Загрузчик */
+
 .preloader {
     width: 50px;
     height: 50px;
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #3498db;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid var(--accent);
     border-radius: 50%;
     animation: spin 2s linear infinite;
 }
@@ -627,8 +633,14 @@ tr > th:nth-child(2n + 1){
 #clear-local-storage-btn{
     background-color: red;
     color: white;
-    width: max-content;
-
 }
 
+#load-button, #submit-button, #clear-local-storage-btn{
+    width: 240px;
+    margin: 5px 0 0 0;
+}
+.comment-form_buttons{
+    display: flex;
+    flex-direction: column;
+}
 

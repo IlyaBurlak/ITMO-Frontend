@@ -500,6 +500,9 @@ html, body {
     .social__item {
         width: 28px;
     }
+    #load-button{
+        margin-top: 10px;
+    }
 
 }
 
